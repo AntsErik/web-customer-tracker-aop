@@ -3,6 +3,7 @@ package ee.praktika.springdemo.aspect;
 import java.util.logging.Logger;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -24,11 +25,11 @@ public class CRMLoggingAspect {
     private void forServicePackage(){
     }
 
-    @Pointcut( "execution(* ee.praktika.springdemo.dao.*.*(..))" )
+    @Pointcut( "execution(* ee.praktika.springdemo.DAO.*.*(..))" )
     private void forDaoPackage(){
     }
 
-    @Pointcut( "forControllerPackage() || forServicePackage() || forDAOPackage()" )
+    @Pointcut( "forControllerPackage() || forServicePackage() || forDaoPackage()" )
     private void forAppFlow(){
     }
 
@@ -40,10 +41,28 @@ public class CRMLoggingAspect {
         String theMethod = theJoinPoint.getSignature().toShortString();
         myLogger.info( "\n===========>>>> in @Before: calling method: " + theMethod );
 
-        //displat the arguments to the method
+        //display the arguments to the method
 
+        //get the arguments for the method call
+        Object[] args = theJoinPoint.getArgs();
+
+        //loop through and display those arguments.
+        for( Object tempArg : args ) {
+            myLogger.info( "\n===========>>>> argument: " + tempArg );
+        }
     }
 
-    //add the afterreturning advice
+    //add the after-returning advice
+    @AfterReturning( pointcut = "forAppFlow()", returning = "theResult" )
+    public void afterReturning( JoinPoint theJoinPoint, Object theResult ){
+
+        //display the method that is being returned
+        String theMethod = theJoinPoint.getSignature().toShortString();
+        myLogger.info( "\n===========>>>> in @AfterReturning: calling method: " + theMethod );
+
+        //display the data
+        myLogger.info( "\n===========>>>> result: " + theResult );
+
+    }
 
 }
